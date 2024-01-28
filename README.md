@@ -14,6 +14,6 @@ Start the container
 ```
 bash run_docker.sh
 ```
-*Note:*Nvidia container toolkit required to run with the script.
+*Note:* Nvidia container toolkit required to run with the script.
 ## Issues
 - Currently, cannot build the wrapper.
