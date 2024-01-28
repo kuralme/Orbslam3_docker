@@ -1,0 +1,70 @@
+FROM ros:noetic-ros-base
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+
+ENV ROS1_WORKSPACE=/root/ROS/ros1_ws
+ENV ORB_SLAM3_DIR=${ROS1_WORKSPACE}/src/ORB_SLAM3/
+ARG ROS_DISTRO=noetic
+
+# Install basic depends
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    htop tmux nano git wget unzip curl \
+    software-properties-common \
+    pkg-config \
+    openssh-server \
+    openssh-client \
+    python3-dev \
+    python3-opencv \
+    python3-numpy \  
+    python3-pip \
+    libopencv-dev
+
+# Install ros depends
+RUN apt-get install -y \
+    ros-${ROS_DISTRO}-pcl-ros \
+    ros-${ROS_DISTRO}-image-transport \
+    ros-${ROS_DISTRO}-image-geometry \
+    ros-${ROS_DISTRO}-cv-bridge \
+    ros-${ROS_DISTRO}-sensor-msgs \
+    ros-${ROS_DISTRO}-vision-msgs \
+    ros-${ROS_DISTRO}-usb-cam \
+    ros-${ROS_DISTRO}-realsense2-camera \
+    ros-${ROS_DISTRO}-rqt* \
+    python3-catkin-tools
+
+# Install orbslam3 depends
+RUN apt-get install -y \
+    libgtk-3-dev \
+    libgtk2.0-dev \
+    libboost-all-dev \
+    libpcap-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libtbb-dev \
+    libtbb2 \
+    libatlas-base-dev \ 
+    libdc1394-22-dev \
+    libeigen3-dev \
+    libgl1-mesa-dev \
+    libglew-dev \
+    libcanberra-gtk-module \
+    libcanberra-gtk3-module \
+    libssl-dev
+
+# Copy from local
+COPY ./ROS/ros1_ws/src/ORB_SLAM3 ${ORB_SLAM3_DIR}
+
+# Build ORB-SLAM3
+WORKDIR ${ORB_SLAM3_DIR}
+RUN chmod +x *.sh && bash build.sh
+
+# Build ROS
+# RUN export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:${ORB_SLAM3_DIR}/Examples/ROS \
+    # && cd ${ORB_SLAM3_DIR} && bash build_ros.sh
+
