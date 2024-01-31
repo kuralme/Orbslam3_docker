@@ -1,10 +1,11 @@
 FROM ros1_slam_base
+SHELL ["/bin/bash", "-c"]
 
 # Setup locale
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV ROS2_WORKSPACE=/root/ROS/ros2_ws
-ENV OSLAMROS2=${ROS2_WORKSPACE}/src/ros2_orbslam3/
+ENV SLAM_ROS2=${ROS2_WORKSPACE}/src/ros2_orbslam3/
 ARG ROS2_DISTRO=foxy
 
 # Setup keys and sources
@@ -27,9 +28,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 # TODO: Add rest of depends -if- and clean
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-SHELL ["/bin/bash", "-c"]
 # Copy from local
-COPY ./ROS/ros2_ws/src/ros2_orbslam3 ${OSLAMROS2}
+COPY ./ROS/ros2_ws/src/ros2_orbslam3 ${SLAM_ROS2}
 
 # Build ROS 2 packages
 WORKDIR ${ROS2_WORKSPACE}
